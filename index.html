@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Eliot Cross | IT-решения</title>
+
+    <!-- Open Graph для соцсетей -->
+    <meta property="og:title" content="Eliot Cross | IT-решения" />
+    <meta property="og:description" content="Боты, сайты, SMS-рассылки, автоматизация, безопасность." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://твой-логин.github.io/portfolio/" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0b0e14;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 820px;
+            width: 100%;
+            background: #141a24;
+            padding: 40px 35px;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 1px solid #2a3344;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #8a9bb5;
+            margin-bottom: 28px;
+            border-left: 3px solid #3b82f6;
+            padding-left: 16px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+            color: #b0c7e7;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #2a3344;
+            padding-bottom: 6px;
+        }
+
+        .section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .section ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #1e2633;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section ul li::before {
+            content: "▹";
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .price-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .price-card {
+            background: #1e2633;
+            padding: 16px 22px;
+            border-radius: 16px;
+            flex: 1 1 160px;
+            border: 1px solid #2a3344;
+        }
+
+        .price-card .name {
+            color: #b0c7e7;
+            font-weight: 600;
+        }
+
+        .price-card .cost {
+            color: #3b82f6;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .contacts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .contacts a {
+            color: #8a9bb5;
+            text-decoration: none;
+            padding: 8px 20px;
+            background: #1e2633;
+            border-radius: 30px;
+            border: 1px solid #2a3344;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .contacts a:hover {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #3b82f6;
+            color: #fff;
+            padding: 12px 34px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 14px;
+            transition: 0.2s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        .footer {
+            margin-top: 32px;
+            font-size: 0.85rem;
+            color: #5a6f8a;
+            text-align: center;
+            border-top: 1px solid #1e2633;
+            padding-top: 22px;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 22px 16px;
+            }
+            h1 {
+                font-size: 1.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Eliot Cross</h1>
+        <div class="tagline">IT-решения под заказ · Автоматизация · Кибербезопасность</div>
+
+        <div class="section">
+            <h2>🚀 Что я делаю</h2>
+            <ul>
+                <li>Telegram-боты (оплата, выдача файлов, автоответы)</li>
+                <li>Сайты, лендинги, админ-панели</li>
+                <li>Скрипты для парсинга и рассылок</li>
+                <li>SMS-рассылки по всему миру (от $0.03)</li>
+                <li>APT-симулятор BlackOut (тестирование защищённости Windows)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>💰 Цены (ориентир)</h2>
+            <div class="price-grid">
+                <div class="price-card">
+                    <div class="name">Telegram-бот</div>
+                    <div class="cost">от $150</div>
+                </div>
+                <div class="price-card">
+                    <div class="name">Сайт-визитка</div>
+                    <div class="cost">от $200</div>
+                </div>
+                <div class="price-card">
+                    <div class="name">SMS-рассылка (1000)</div>
+                    <div class="cost">от $30</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📁 Примеры работ</h2>
+            <ul>
+                <li><strong>BlackOut</strong> — APT-симулятор для Windows</li>
+                <li><strong>SMS-рассылка</strong> — Австралия, 1000+ SMS</li>
+                <li><strong>Telegram-бот</strong> — приём платежей в крипте</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📩 Контакты</h2>
+            <div class="contacts">
+                <a href="https://t.me/RATNIKIPCbot" target="_blank">📬 Telegram (заказы)</a>
+                <a href="https://t.me/BLACKOUTCPP" target="_blank">📢 Канал</a>
+                <a href="https://www.tiktok.com/@blackout.sec" target="_blank">🎵 TikTok</a>
+                <a href="https://youtube.com/@EliotCross-c4d" target="_blank">▶️ YouTube</a>
+            </div>
+            <br />
+            <a href="https://t.me/RATNIKIPCbot" class="btn" target="_blank">📩 Связаться</a>
+        </div>
+
+        <div class="footer">
+            Eliot Cross · 2026
+        </div>
+
+    </div>
+</body>
+</html>
