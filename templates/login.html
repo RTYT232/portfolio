@@ -1,12 +1,108 @@
 <!DOCTYPE html>
-<html>
-<head><title>Вход</title></head>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в админку</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: #0b0e14;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: #141a24;
+            padding: 40px 35px;
+            border-radius: 32px;
+            border: 1px solid #2a3344;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .login-box h1 {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .login-box p {
+            color: #8a9bb5;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #2a3344;
+            background: #0b0e14;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 16px;
+            transition: 0.2s;
+        }
+        .login-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .login-box button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .login-box .error {
+            color: #f87171;
+            font-size: 14px;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #5a6f8a;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+    </style>
+</head>
 <body>
-    <h2>Вход в админ панель</h2>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Логин" required><br><br>
-        <input type="password" name="password" placeholder="Пароль" required><br><br>
-        <button type="submit">Войти</button>
-    </form>
+    <div class="login-box">
+        <h1>🔐 Вход</h1>
+        <p>Введите логин и пароль для доступа</p>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Логин" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <div class="footer">
+            <a href="https://RTYT232.github.io/portfolio/" target="_blank">Вернуться на сайт</a>
+        </div>
+    </div>
 </body>
 </html>
