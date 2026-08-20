@@ -2,34 +2,185 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ панель</title>
     <style>
-        body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
-        th { background: #222; }
-        .logout { float: right; color: #f66; text-decoration: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: #0b0e14;
+            color: #e0e0e0;
+            padding: 30px 20px;
+            min-height: 100vh;
+        }
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .header h1 span {
+            color: #3b82f6;
+        }
+        .header .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: #141a24;
+            border: 1px solid #2a3344;
+            border-radius: 16px;
+            padding: 10px 22px;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #8a9bb5;
+        }
+        .logout-btn {
+            background: #2a3344;
+            padding: 10px 22px;
+            border-radius: 30px;
+            color: #f87171;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            border: 1px solid #3a4458;
+        }
+        .logout-btn:hover {
+            background: #f87171;
+            color: #fff;
+        }
+        .table-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #141a24;
+            border-radius: 24px;
+            border: 1px solid #2a3344;
+            overflow: hidden;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            color: #8a9bb5;
+            font-weight: 500;
+            font-size: 13px;
+            border-bottom: 1px solid #2a3344;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #1e2633;
+            font-size: 14px;
+        }
+        .badge-paid {
+            background: #0a3d2a;
+            color: #4ade80;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-wait {
+            background: #3d2a0a;
+            color: #fbbf24;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            text-align: center;
+            color: #5a6f8a;
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            .header { flex-direction: column; align-items: stretch; }
+            .stats { justify-content: space-between; }
+            .table-wrap { padding: 12px; }
+            th, td { padding: 8px 6px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
-    <a href="/logout" class="logout">Выйти</a>
-    <h1>📊 Заказы</h1>
-    <table>
-        <thead>
-            <tr><th>ID</th><th>Пользователь</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order[0] }}</td>
-                <td>{{ order[1] }}</td>
-                <td>{{ order[2] }}</td>
-                <td>${{ order[4] }}</td>
-                <td>{{ 'Оплачен' if order[5] else 'Ожидает' }}</td>
-                <td>{{ order[7][:16] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="header">
+        <h1>📊 <span>Swill</span> Monitor</h1>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="num">{{ orders|length }}</div>
+                <div class="label">Всего заказов</div>
+            </div>
+            <div class="stat-card">
+                <div class="num">{{ orders|selectattr('5', 'eq', 1)|list|length }}</div>
+                <div class="label">Оплачено</div>
+            </div>
+            <div class="stat-card">
+                <div class="num">{{ orders|selectattr('5', 'eq', 0)|list|length }}</div>
+                <div class="label">Ожидают</div>
+            </div>
+            <a href="/logout" class="logout-btn">🚪 Выйти</a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пользователь</th>
+                    <th>Тариф</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order[0] }}</td>
+                    <td>{{ order[1] }}</td>
+                    <td>{{ order[2] }}</td>
+                    <td>${{ order[4] }}</td>
+                    <td>
+                        {% if order[5] %}
+                            <span class="badge-paid">✅ Оплачен</span>
+                        {% else %}
+                            <span class="badge-wait">⏳ Ожидает</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ order[7][:16] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <a href="https://RTYT232.github.io/portfolio/" target="_blank" style="color:#3b82f6;text-decoration:none;">Вернуться на сайт</a>
+    </div>
 </body>
 </html>
