@@ -34,26 +34,37 @@
         .header h1 span {
             color: #3b82f6;
         }
-        .header .stats {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
         }
         .stat-card {
             background: #141a24;
             border: 1px solid #2a3344;
             border-radius: 16px;
-            padding: 10px 22px;
+            padding: 18px 16px;
             text-align: center;
         }
         .stat-card .num {
-            font-size: 22px;
+            font-size: 28px;
             font-weight: 700;
             color: #fff;
         }
         .stat-card .label {
             font-size: 13px;
             color: #8a9bb5;
+            margin-top: 4px;
+        }
+        .stat-card .sub {
+            font-size: 12px;
+            color: #4ade80;
+            margin-top: 4px;
+        }
+        .stat-card .sub-sms {
+            color: #60a5fa;
         }
         .logout-btn {
             background: #2a3344;
@@ -71,7 +82,7 @@
         }
         .table-wrap {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 20px auto 0;
             background: #141a24;
             border-radius: 24px;
             border: 1px solid #2a3344;
@@ -111,6 +122,35 @@
             font-size: 12px;
             font-weight: 600;
         }
+        .chart {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            background: #141a24;
+            border-radius: 24px;
+            border: 1px solid #2a3344;
+            padding: 20px;
+        }
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 120px;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .bar {
+            flex: 1;
+            background: #3b82f6;
+            border-radius: 6px 6px 0 0;
+            min-height: 4px;
+            transition: 0.3s;
+        }
+        .bar-label {
+            text-align: center;
+            font-size: 11px;
+            color: #8a9bb5;
+            margin-top: 6px;
+        }
         .footer {
             max-width: 1200px;
             margin: 20px auto 0;
@@ -118,9 +158,13 @@
             color: #5a6f8a;
             font-size: 13px;
         }
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
         @media (max-width: 600px) {
             .header { flex-direction: column; align-items: stretch; }
-            .stats { justify-content: space-between; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
             .table-wrap { padding: 12px; }
             th, td { padding: 8px 6px; font-size: 12px; }
         }
@@ -129,20 +173,54 @@
 <body>
     <div class="header">
         <h1>📊 <span>Swill</span> Monitor</h1>
-        <div class="stats">
-            <div class="stat-card">
-                <div class="num">{{ orders|length }}</div>
-                <div class="label">Всего заказов</div>
-            </div>
-            <div class="stat-card">
-                <div class="num">{{ orders|selectattr('5', 'eq', 1)|list|length }}</div>
-                <div class="label">Оплачено</div>
-            </div>
-            <div class="stat-card">
-                <div class="num">{{ orders|selectattr('5', 'eq', 0)|list|length }}</div>
-                <div class="label">Ожидают</div>
-            </div>
-            <a href="/logout" class="logout-btn">🚪 Выйти</a>
+        <a href="/logout" class="logout-btn">🚪 Выйти</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">{{ total_orders }}</div>
+            <div class="label">Всего заказов</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ paid_orders }}</div>
+            <div class="label">Оплачено</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">${{ total_revenue }}</div>
+            <div class="label">Доход</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">${{ avg_check }}</div>
+            <div class="label">Средний чек</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ total_sms }}</div>
+            <div class="label">📱 SMS отправлено</div>
+            <div class="sub sub-sms">+ за всё время</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ total_bots }}</div>
+            <div class="label">🤖 Ботов сделано</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ total_sites }}</div>
+            <div class="label">🌐 Сайтов / лендингов</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ total_clients }}</div>
+            <div class="label">👤 Клиентов</div>
+        </div>
+    </div>
+
+    <div class="chart">
+        <h3 style="color:#b0c7e7; margin-bottom: 6px;">📈 Продажи по дням</h3>
+        <div class="chart-bars">
+            {% for day in chart_data %}
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                    <div class="bar" style="height: {{ day.height }}px;"></div>
+                    <div class="bar-label">{{ day.label }}</div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -151,7 +229,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Пользователь</th>
+                    <th>Клиент</th>
                     <th>Тариф</th>
                     <th>Сумма</th>
                     <th>Статус</th>
@@ -180,7 +258,7 @@
     </div>
 
     <div class="footer">
-        <a href="https://RTYT232.github.io/portfolio/" target="_blank" style="color:#3b82f6;text-decoration:none;">Вернуться на сайт</a>
+        <a href="https://rtyt232.github.io/portfolio/" target="_blank" style="color:#3b82f6;text-decoration:none;">Вернуться на сайт</a>
     </div>
 </body>
 </html>
