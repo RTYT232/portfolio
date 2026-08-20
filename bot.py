@@ -5,11 +5,13 @@ import sqlite3
 import random
 import string
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
+# ===== КОНФИГИ =====
 TOKEN = "8984654579:AAGaUlKtAjJd7wqR5BsaLEBMUeGKmztC-pM"
+NOWPAYMENTS_API_KEY = "438GJF7-CF747JD-G38BH6E-QZ1C7YD"
 MONERO_ADDRESS = "46r6fC7DptBgov3ZQPtdzJ8Ge8o1fDiqe8UPPm1BxDLC4iHrFwn32PUWTXz3qH8jdaRMzuXG3obCdEbNncoJfMDHRMQ4N91"
 USDT_ADDRESS = "TEmyv3w1CjftMMbF4qxEffV8P2P3D9m8xa"
 FILE_URL = "https://tmpfiles.org/wRwDSeA58F4E/blackout.exe"
@@ -39,6 +41,7 @@ def init_db():
         paid INTEGER DEFAULT 0,
         file_url TEXT,
         license_key TEXT,
+        payment_id TEXT,
         created_at TEXT
     )''')
     c.execute('''CREATE TABLE IF NOT EXISTS stats (
@@ -49,26 +52,24 @@ def init_db():
     )''')
     conn.commit()
 
-    # Добавляем колонку license_key, если её нет
     try:
-        c.execute("ALTER TABLE orders ADD COLUMN license_key TEXT")
+        c.execute("ALTER TABLE orders ADD COLUMN payment_id TEXT")
         conn.commit()
     except sqlite3.OperationalError:
-        pass  # колонка уже существует
+        pass
 
-    # Демо-данные
     c.execute("SELECT COUNT(*) FROM orders")
     if c.fetchone()[0] == 0:
         demo_orders = [
-            (123456, "Алексей", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), (datetime.now() - timedelta(days=10)).isoformat()),
-            (123457, "Михаил", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), (datetime.now() - timedelta(days=8)).isoformat()),
-            (123458, "Екатерина", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), (datetime.now() - timedelta(days=6)).isoformat()),
-            (123459, "Дмитрий", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), (datetime.now() - timedelta(days=4)).isoformat()),
-            (123460, "Ольга", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), (datetime.now() - timedelta(days=2)).isoformat()),
-            (123461, "Сергей", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), (datetime.now() - timedelta(days=1)).isoformat()),
-            (123462, "Ирина", "pro", MONERO_ADDRESS, 299, 0, "", generate_license(), datetime.now().isoformat()),
+            (123456, "Алексей", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), "", (datetime.now() - timedelta(days=10)).isoformat()),
+            (123457, "Михаил", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), "", (datetime.now() - timedelta(days=8)).isoformat()),
+            (123458, "Екатерина", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), "", (datetime.now() - timedelta(days=6)).isoformat()),
+            (123459, "Дмитрий", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), "", (datetime.now() - timedelta(days=4)).isoformat()),
+            (123460, "Ольга", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), "", (datetime.now() - timedelta(days=2)).isoformat()),
+            (123461, "Сергей", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), "", (datetime.now() - timedelta(days=1)).isoformat()),
+            (123462, "Ирина", "pro", MONERO_ADDRESS, 299, 0, "", generate_license(), "", datetime.now().isoformat()),
         ]
-        c.executemany("INSERT INTO orders (user_id, name, plan, address, amount, paid, file_url, license_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", demo_orders)
+        c.executemany("INSERT INTO orders (user_id, name, plan, address, amount, paid, file_url, license_key, payment_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", demo_orders)
 
     c.execute("SELECT COUNT(*) FROM stats")
     if c.fetchone()[0] == 0:
@@ -77,12 +78,12 @@ def init_db():
     conn.commit()
     conn.close()
 
-def add_order(user_id, name, plan, address, amount):
+def add_order(user_id, name, plan, address, amount, payment_id):
     license_key = generate_license()
     conn = sqlite3.connect('orders.db')
     c = conn.cursor()
-    c.execute("INSERT INTO orders (user_id, name, plan, address, amount, license_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-              (user_id, name, plan, address, amount, license_key, datetime.now().isoformat()))
+    c.execute("INSERT INTO orders (user_id, name, plan, address, amount, license_key, payment_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+              (user_id, name, plan, address, amount, license_key, payment_id, datetime.now().isoformat()))
     conn.commit()
     conn.close()
     return license_key
@@ -112,6 +113,14 @@ def mark_paid(order_id, file_url):
     conn.commit()
     conn.close()
 
+def get_order_by_payment_id(payment_id):
+    conn = sqlite3.connect('orders.db')
+    c = conn.cursor()
+    c.execute("SELECT id, user_id, license_key FROM orders WHERE payment_id=? AND paid=0", (payment_id,))
+    row = c.fetchone()
+    conn.close()
+    return row
+
 def get_license_by_user(user_id):
     conn = sqlite3.connect('orders.db')
     c = conn.cursor()
@@ -120,32 +129,25 @@ def get_license_by_user(user_id):
     conn.close()
     return row[0] if row else None
 
-# ===== ПРОВЕРКА ПЛАТЕЖЕЙ =====
-def check_monero(amount_usd):
+# ===== NOWPAYMENTS =====
+def create_nowpayments_payment(amount, order_id, user_id):
+    url = "https://api.nowpayments.io/v1/payment"
+    headers = {
+        "x-api-key": NOWPAYMENTS_API_KEY,
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "price_amount": amount,
+        "price_currency": "usd",
+        "pay_currency": "usdtrc20",
+        "order_id": f"order_{order_id}",
+        "order_description": f"user_{user_id}"
+    }
     try:
-        url = f"https://xmrchain.net/api/transactions?address={MONERO_ADDRESS}"
-        r = requests.get(url, timeout=10)
-        data = r.json()
-        total_xmr = 0
-        for tx in data.get("data", {}).get("transactions", []):
-            if tx.get("direction") == "in":
-                total_xmr += tx.get("amount", 0) / 1e12
-        return total_xmr * 140 >= amount_usd
-    except:
-        return False
-
-def check_usdt(amount_usd):
-    try:
-        url = f"https://api.trongrid.io/v1/accounts/{USDT_ADDRESS}/transactions/trc20?limit=50"
-        r = requests.get(url, timeout=10)
-        data = r.json()
-        total_usdt = 0
-        for tx in data.get("data", []):
-            if tx.get("type") == "Transfer" and tx.get("to") == USDT_ADDRESS:
-                total_usdt += int(tx.get("value", 0)) / 1e6
-        return total_usdt >= amount_usd
-    except:
-        return False
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        return response.json()
+    except Exception as e:
+        return {"error": str(e)}
 
 # ===== TELEGRAM БОТ =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -194,13 +196,23 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("❌ Неизвестный тариф.")
             return
 
-        license_key = add_order(user_id, name, plan, MONERO_ADDRESS, amount)
-        await query.edit_message_text(
-            f"💰 {plan.upper()} — ${amount}\n{desc}\n\n"
-            f"💳 Оплата:\nMonero:\n`{MONERO_ADDRESS}`\n\nUSDT:\n`{USDT_ADDRESS}`\n\n"
-            f"🔑 Лицензия будет сгенерирована после оплаты.\n"
-            f"После оплаты напишите /confirm"
-        )
+        # Создаём заказ в БД
+        order_id = None
+        license_key = generate_license()
+        payment_id = f"order_{random.randint(100000, 999999)}"
+
+        # Создаём платёж в NowPayments
+        payment = create_nowpayments_payment(amount, order_id, user_id)
+        if "invoice_url" in payment:
+            await query.edit_message_text(
+                f"💰 {plan.upper()} — ${amount}\n{desc}\n\n"
+                f"🔗 Ссылка для оплаты:\n{payment['invoice_url']}\n\n"
+                f"После оплаты файл и лицензия придут автоматически."
+            )
+            # Сохраняем заказ
+            add_order(user_id, name, plan, MONERO_ADDRESS, amount, payment_id)
+        else:
+            await query.edit_message_text("❌ Ошибка создания платежа. Попробуйте позже.")
 
     elif data == "instructions":
         await query.edit_message_text("📖 Скачайте .exe → добавьте в исключения → запустите от администратора.")
@@ -211,33 +223,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await query.edit_message_text("❌ Неизвестная команда.")
 
-async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    await update.message.reply_text("⏳ Проверяю платежи...")
-
-    if check_monero(50) or check_usdt(50):
-        license_key = get_license_by_user(user_id)
-        if not license_key:
-            license_key = generate_license()
-        await update.message.reply_text(
-            f"✅ Платёж подтверждён!\n"
-            f"🔑 Лицензия: `{license_key}`\n"
-            f"📥 Ссылка на скачивание:\n{FILE_URL}\n\n"
-            f"Сохраните лицензию — она понадобится для активации."
-        )
-    else:
-        await update.message.reply_text("❌ Платёж не найден. Попробуйте позже.")
-
 def run_bot():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("confirm", confirm))
     app.add_handler(CommandHandler("price", price))
     app.add_handler(CallbackQueryHandler(button))
     print("✅ Бот запущен!")
     app.run_polling()
 
-# ===== FLASK АДМИНКА =====
+# ===== FLASK АДМИНКА + WEBHOOK =====
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
@@ -254,10 +248,8 @@ def login():
 def admin_dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-
     orders = get_all_orders()
     total_sms, total_bots, total_sites = get_stats()
-
     paid_orders = [o for o in orders if o[5] == 1]
     total_revenue = sum(o[4] for o in paid_orders)
     total_clients = len(set(o[1] for o in orders))
@@ -295,13 +287,8 @@ def send_request():
     message = data.get('message')
     if not message:
         return {'error': 'no message'}, 400
-
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        'chat_id': ADMIN_CHAT_ID,
-        'text': message,
-        'parse_mode': 'HTML'
-    }
+    payload = {'chat_id': ADMIN_CHAT_ID, 'text': message, 'parse_mode': 'HTML'}
     try:
         r = req.post(url, json=payload)
         if r.status_code == 200:
@@ -310,6 +297,36 @@ def send_request():
             return {'error': 'telegram error'}, 500
     except:
         return {'error': 'network error'}, 500
+
+# ===== WEBHOOK =====
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+    if data.get('payment_status') == 'finished':
+        payment_id = data.get('order_id')
+        if payment_id:
+            order = get_order_by_payment_id(payment_id)
+            if order:
+                order_id, user_id, license_key = order
+                mark_paid(order_id, FILE_URL)
+                # Отправка файла и лицензии пользователю
+                import requests as req
+                url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+                payload = {
+                    'chat_id': user_id,
+                    'text': f"✅ Оплата подтверждена!\n🔑 Лицензия: `{license_key}`\n📥 Ссылка: {FILE_URL}",
+                    'parse_mode': 'Markdown'
+                }
+                req.post(url, json=payload)
+                # Уведомление админу
+                payload_admin = {
+                    'chat_id': ADMIN_CHAT_ID,
+                    'text': f"🛒 Новая продажа!\nПользователь: {user_id}\nЛицензия: {license_key}",
+                    'parse_mode': 'HTML'
+                }
+                req.post(url, json=payload_admin)
+                return jsonify({"ok": True}), 200
+    return jsonify({"error": "invalid"}), 400
 
 # ===== ЗАПУСК =====
 if __name__ == "__main__":
