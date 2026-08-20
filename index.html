@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eliot Cross | IT-решения</title>
 
     <!-- Open Graph для соцсетей -->
     <meta property="og:title" content="Eliot Cross | IT-решения" />
     <meta property="og:description" content="Боты, сайты, SMS-рассылки, автоматизация, безопасность." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://твой-логин.github.io/portfolio/" />
+    <meta property="og:url" content="https://RTYT232.github.io/portfolio/" />
 
     <style>
         * {
@@ -163,6 +163,58 @@
             padding-top: 22px;
         }
 
+        /* ===== Стили для формы ===== */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-width: 500px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #2a3344;
+            background: #0b0e14;
+            color: #fff;
+            font-size: 15px;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-group button {
+            background: #3b82f6;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .form-group button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        #formStatus {
+            margin-top: 14px;
+            color: #4ade80;
+            font-weight: 500;
+        }
+
         @media (max-width: 500px) {
             .container {
                 padding: 22px 16px;
@@ -179,6 +231,7 @@
         <h1>Eliot Cross</h1>
         <div class="tagline">IT-решения под заказ · Автоматизация · Кибербезопасность</div>
 
+        <!-- ===== ЧТО Я ДЕЛАЮ ===== -->
         <div class="section">
             <h2>🚀 Что я делаю</h2>
             <ul>
@@ -190,6 +243,7 @@
             </ul>
         </div>
 
+        <!-- ===== ЦЕНЫ ===== -->
         <div class="section">
             <h2>💰 Цены (ориентир)</h2>
             <div class="price-grid">
@@ -208,6 +262,7 @@
             </div>
         </div>
 
+        <!-- ===== ПРИМЕРЫ РАБОТ ===== -->
         <div class="section">
             <h2>📁 Примеры работ</h2>
             <ul>
@@ -217,6 +272,31 @@
             </ul>
         </div>
 
+        <!-- ===== ФОРМА ЗАЯВКИ ===== -->
+        <div class="section">
+            <h2>📝 Оставить заявку</h2>
+            <p style="color: #8a9bb5; margin-bottom: 20px;">
+                Заполните форму, и я свяжусь с вами в течение 24 часов.
+            </p>
+            <form id="orderForm" class="form-group">
+                <input type="text" id="name" placeholder="Ваше имя или Telegram" required>
+                <input type="text" id="contact" placeholder="Контакт (Telegram / номер)" required>
+                <select id="service">
+                    <option value="telegram_bot">Telegram-бот</option>
+                    <option value="website">Сайт / лендинг</option>
+                    <option value="sms">SMS-рассылка</option>
+                    <option value="blackout">BlackOut (APT-симулятор)</option>
+                    <option value="other">Другое</option>
+                </select>
+                <input type="number" id="budget" placeholder="Бюджет ($)">
+                <input type="text" id="deadline" placeholder="Срок (например, 3 дня)">
+                <textarea id="details" rows="3" placeholder="Подробности задачи..."></textarea>
+                <button type="submit">📩 Отправить заявку</button>
+            </form>
+            <div id="formStatus"></div>
+        </div>
+
+        <!-- ===== КОНТАКТЫ ===== -->
         <div class="section">
             <h2>📩 Контакты</h2>
             <div class="contacts">
@@ -234,5 +314,46 @@
         </div>
 
     </div>
+
+    <!-- ===== СКРИПТ ОТПРАВКИ ЗАЯВКИ ===== -->
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const service = document.getElementById('service').value;
+            const budget = document.getElementById('budget').value.trim();
+            const deadline = document.getElementById('deadline').value.trim();
+            const details = document.getElementById('details').value.trim();
+
+            const message = 
+`📩 Новая заявка с сайта
+
+👤 Имя: ${name}
+📱 Контакт: ${contact}
+🛠 Услуга: ${service}
+💰 Бюджет: $${budget || 'не указан'}
+⏳ Срок: ${deadline || 'не указан'}
+📝 Подробности: ${details || 'нет'}`;
+
+            try {
+                const response = await fetch('https://telegrambot-2ofw.onrender.com/send-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                if (response.ok) {
+                    document.getElementById('formStatus').innerHTML = '✅ Заявка отправлена! Я свяжусь с вами в ближайшее время.';
+                    document.getElementById('orderForm').reset();
+                } else {
+                    document.getElementById('formStatus').innerHTML = '❌ Ошибка отправки. Попробуйте позже.';
+                }
+            } catch (error) {
+                document.getElementById('formStatus').innerHTML = '❌ Ошибка сети. Проверьте интернет.';
+            }
+        });
+    </script>
 </body>
 </html>
