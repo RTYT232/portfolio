@@ -2,6 +2,8 @@ import logging
 import time
 import requests
 import sqlite3
+import random
+import string
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, session
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -14,6 +16,14 @@ FILE_URL = "https://tmpfiles.org/wRwDSeA58F4E/blackout.exe"
 ADMIN_USER = "admin"
 ADMIN_PASS = "swill2026"
 ADMIN_CHAT_ID = "8640296115"
+
+# ===== ГЕНЕРАТОР ЛИЦЕНЗИЙ =====
+def generate_license():
+    parts = []
+    for _ in range(3):
+        part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        parts.append(part)
+    return f"BLACKOUT-{'-'.join(parts)}"
 
 # ===== БАЗА ДАННЫХ =====
 def init_db():
@@ -28,6 +38,7 @@ def init_db():
         amount REAL,
         paid INTEGER DEFAULT 0,
         file_url TEXT,
+        license_key TEXT,
         created_at TEXT
     )''')
     c.execute('''CREATE TABLE IF NOT EXISTS stats (
@@ -38,18 +49,26 @@ def init_db():
     )''')
     conn.commit()
 
+    # Добавляем колонку license_key, если её нет
+    try:
+        c.execute("ALTER TABLE orders ADD COLUMN license_key TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # колонка уже существует
+
+    # Демо-данные
     c.execute("SELECT COUNT(*) FROM orders")
     if c.fetchone()[0] == 0:
         demo_orders = [
-            (123456, "Алексей", "pro", MONERO_ADDRESS, 299, 1, "", (datetime.now() - timedelta(days=10)).isoformat()),
-            (123457, "Михаил", "lite", MONERO_ADDRESS, 99, 1, "", (datetime.now() - timedelta(days=8)).isoformat()),
-            (123458, "Екатерина", "enterprise", MONERO_ADDRESS, 999, 1, "", (datetime.now() - timedelta(days=6)).isoformat()),
-            (123459, "Дмитрий", "pro", MONERO_ADDRESS, 299, 1, "", (datetime.now() - timedelta(days=4)).isoformat()),
-            (123460, "Ольга", "lite", MONERO_ADDRESS, 99, 1, "", (datetime.now() - timedelta(days=2)).isoformat()),
-            (123461, "Сергей", "enterprise", MONERO_ADDRESS, 999, 1, "", (datetime.now() - timedelta(days=1)).isoformat()),
-            (123462, "Ирина", "pro", MONERO_ADDRESS, 299, 0, "", datetime.now().isoformat()),
+            (123456, "Алексей", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), (datetime.now() - timedelta(days=10)).isoformat()),
+            (123457, "Михаил", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), (datetime.now() - timedelta(days=8)).isoformat()),
+            (123458, "Екатерина", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), (datetime.now() - timedelta(days=6)).isoformat()),
+            (123459, "Дмитрий", "pro", MONERO_ADDRESS, 299, 1, "", generate_license(), (datetime.now() - timedelta(days=4)).isoformat()),
+            (123460, "Ольга", "lite", MONERO_ADDRESS, 99, 1, "", generate_license(), (datetime.now() - timedelta(days=2)).isoformat()),
+            (123461, "Сергей", "enterprise", MONERO_ADDRESS, 999, 1, "", generate_license(), (datetime.now() - timedelta(days=1)).isoformat()),
+            (123462, "Ирина", "pro", MONERO_ADDRESS, 299, 0, "", generate_license(), datetime.now().isoformat()),
         ]
-        c.executemany("INSERT INTO orders (user_id, name, plan, address, amount, paid, file_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", demo_orders)
+        c.executemany("INSERT INTO orders (user_id, name, plan, address, amount, paid, file_url, license_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", demo_orders)
 
     c.execute("SELECT COUNT(*) FROM stats")
     if c.fetchone()[0] == 0:
@@ -59,12 +78,14 @@ def init_db():
     conn.close()
 
 def add_order(user_id, name, plan, address, amount):
+    license_key = generate_license()
     conn = sqlite3.connect('orders.db')
     c = conn.cursor()
-    c.execute("INSERT INTO orders (user_id, name, plan, address, amount, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-              (user_id, name, plan, address, amount, datetime.now().isoformat()))
+    c.execute("INSERT INTO orders (user_id, name, plan, address, amount, license_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+              (user_id, name, plan, address, amount, license_key, datetime.now().isoformat()))
     conn.commit()
     conn.close()
+    return license_key
 
 def get_all_orders():
     conn = sqlite3.connect('orders.db')
@@ -90,6 +111,14 @@ def mark_paid(order_id, file_url):
     c.execute("UPDATE orders SET paid=1, file_url=? WHERE id=?", (file_url, order_id))
     conn.commit()
     conn.close()
+
+def get_license_by_user(user_id):
+    conn = sqlite3.connect('orders.db')
+    c = conn.cursor()
+    c.execute("SELECT license_key FROM orders WHERE user_id=? AND paid=1 ORDER BY id DESC LIMIT 1", (user_id,))
+    row = c.fetchone()
+    conn.close()
+    return row[0] if row else None
 
 # ===== ПРОВЕРКА ПЛАТЕЖЕЙ =====
 def check_monero(amount_usd):
@@ -165,10 +194,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("❌ Неизвестный тариф.")
             return
 
-        add_order(user_id, name, plan, MONERO_ADDRESS, amount)
+        license_key = add_order(user_id, name, plan, MONERO_ADDRESS, amount)
         await query.edit_message_text(
             f"💰 {plan.upper()} — ${amount}\n{desc}\n\n"
             f"💳 Оплата:\nMonero:\n`{MONERO_ADDRESS}`\n\nUSDT:\n`{USDT_ADDRESS}`\n\n"
+            f"🔑 Лицензия будет сгенерирована после оплаты.\n"
             f"После оплаты напишите /confirm"
         )
 
@@ -182,9 +212,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("❌ Неизвестная команда.")
 
 async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
     await update.message.reply_text("⏳ Проверяю платежи...")
+
     if check_monero(50) or check_usdt(50):
-        await update.message.reply_text(f"✅ Платёж подтверждён!\nСсылка: {FILE_URL}")
+        license_key = get_license_by_user(user_id)
+        if not license_key:
+            license_key = generate_license()
+        await update.message.reply_text(
+            f"✅ Платёж подтверждён!\n"
+            f"🔑 Лицензия: `{license_key}`\n"
+            f"📥 Ссылка на скачивание:\n{FILE_URL}\n\n"
+            f"Сохраните лицензию — она понадобится для активации."
+        )
     else:
         await update.message.reply_text("❌ Платёж не найден. Попробуйте позже.")
 
