@@ -227,8 +227,8 @@ def admin_dashboard():
         day = datetime.now() - timedelta(days=i)
         label = day.strftime('%d.%m')
         day_orders = [o for o in orders if o[7].startswith(day.strftime('%Y-%m-%d'))]
-        height = min(100, len(day_orders) * 25)
-        chart_data.append({'label': label, 'height': height})
+        value = len(day_orders)
+        chart_data.append({'label': label, 'value': value})
 
     return render_template('admin.html',
         orders=orders,
