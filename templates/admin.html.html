@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ панель</title>
+    <style>
+        body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        th { background: #222; }
+        .logout { float: right; color: #f66; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="/logout" class="logout">Выйти</a>
+    <h1>📊 Заказы</h1>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Пользователь</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order[0] }}</td>
+                <td>{{ order[1] }}</td>
+                <td>{{ order[2] }}</td>
+                <td>${{ order[4] }}</td>
+                <td>{{ 'Оплачен' if order[5] else 'Ожидает' }}</td>
+                <td>{{ order[7][:16] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
