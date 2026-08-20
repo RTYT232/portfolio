@@ -3,36 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход</title>
+    <title>Вход в систему</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: #0b0e14; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: #141a24; padding: 40px 35px; border-radius: 32px; border: 1px solid #2a3344; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .login-box h1 { color: #fff; font-size: 26px; font-weight: 600; margin-bottom: 8px; }
-        .login-box p { color: #8a9bb5; font-size: 14px; margin-bottom: 28px; }
-        .login-box input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid #2a3344; background: #0b0e14; color: #fff; font-size: 15px; margin-bottom: 16px; transition: 0.2s; }
-        .login-box input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-        .login-box button { width: 100%; padding: 14px; background: #3b82f6; border: none; border-radius: 14px; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .login-box button:hover { background: #2563eb; transform: scale(1.02); }
-        .login-box .error { color: #f87171; font-size: 14px; margin-top: 12px; text-align: center; }
-        .footer { text-align: center; margin-top: 20px; color: #5a6f8a; font-size: 13px; }
-        .footer a { color: #3b82f6; text-decoration: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0817;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+            background: #120f24;
+            padding: 40px 35px;
+            border-radius: 28px;
+            box-shadow: 0 10px 40px rgba(167, 139, 250, 0.12);
+            border: 1px solid #2a1f4a;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-container h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .login-container .subtitle {
+            color: #8a7ba8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .login-container .subtitle i {
+            color: #4ade80;
+            margin-right: 6px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #c4b5d4;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #2a1f4a;
+            background: #0a0817;
+            color: #fff;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #7c3aed;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+        }
+        .btn-login:hover {
+            background: #6d28d9;
+            transform: scale(1.02);
+            box-shadow: 0 0 35px rgba(124, 58, 237, 0.5);
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #8a7ba8;
+            font-size: 0.9rem;
+        }
+        .register-link a {
+            color: #4ade80;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        .flash-message {
+            background: #2a1f4a;
+            padding: 10px 16px;
+            border-radius: 12px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-left: 3px solid #fbbf24;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 16px;
+            color: #8a7ba8;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .back-link:hover {
+            color: #4ade80;
+        }
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            color: #5a4a7a;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
+    <div class="login-container">
         <h1>🔐 Вход</h1>
-        <p>Введите логин и пароль для доступа</p>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Логин" required>
-            <input type="password" name="password" placeholder="Пароль" required>
-            <button type="submit">Войти</button>
+        <div class="subtitle">
+            <i class="fas fa-shield-alt"></i> Swill Monitor
+        </div>
+
+        <!-- ===== СООБЩЕНИЯ ОБ ОШИБКАХ ===== -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- ===== ФОРМА ВХОДА ===== -->
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Логин</label>
+                <input type="text" id="username" name="username" placeholder="Ваш логин" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Ваш пароль" required>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Войти
+            </button>
         </form>
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
+
+        <div class="register-link">
+            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="/" class="back-link">
+                <i class="fas fa-arrow-left"></i> Вернуться на сайт
+            </a>
+        </div>
+
         <div class="footer">
-            <a href="https://rtyt232.github.io/portfolio/" target="_blank">Вернуться на сайт</a>
+            Eliot Cross · 2026
         </div>
     </div>
 </body>
