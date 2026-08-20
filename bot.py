@@ -167,7 +167,30 @@ def admin_dashboard():
     orders = get_all_orders()
     return render_template('admin.html', orders=orders)
 
-@app.route('/logout')
+@app.route('/logout') 
+@app.route('/send-request', methods=['POST'])
+def send_request():
+    import requests as req
+    data = req.get_json()
+    message = data.get('message')
+    if not message:
+        return {'error': 'no message'}, 400
+
+    # Отправляем в Telegram тебе
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    payload = {
+        'chat_id': '@Frycrycry',  # ⚠️@Frycrycry
+        'text': message,
+        'parse_mode': 'HTML'
+    }
+    try:
+        r = req.post(url, json=payload)
+        if r.status_code == 200:
+            return {'ok': True}, 200
+        else:
+            return {'error': 'telegram error'}, 500
+    except:
+        return {'error': 'network error'}, 500
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
