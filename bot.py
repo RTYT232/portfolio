@@ -7,7 +7,6 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# ===== КОНФИГИ =====
 TOKEN = "8984654579:AAGaUlKtAjJd7wqR5BsaLEBMUeGKmztC-pM"
 MONERO_ADDRESS = "46r6fC7DptBgov3ZQPtdzJ8Ge8o1fDiqe8UPPm1BxDLC4iHrFwn32PUWTXz3qH8jdaRMzuXG3obCdEbNncoJfMDHRMQ4N91"
 USDT_ADDRESS = "TEmyv3w1CjftMMbF4qxEffV8P2P3D9m8xa"
@@ -39,7 +38,6 @@ def init_db():
     )''')
     conn.commit()
 
-    # ===== ДЕМО-ДАННЫЕ =====
     c.execute("SELECT COUNT(*) FROM orders")
     if c.fetchone()[0] == 0:
         demo_orders = [
@@ -133,6 +131,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("👋 Добро пожаловать в Swill Monitor!", reply_markup=reply_markup)
 
+async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = (
+        "📊 *Прайс-лист Swill Monitor*\n\n"
+        "🤖 *Telegram-бот* — от $150\n"
+        "🌐 *Сайт-визитка* — от $200\n"
+        "📱 *SMS-рассылка (1000)* — от $30\n"
+        "🛡 *BlackOut (APT-симулятор)* — $99–$999\n\n"
+        "Все проекты — под ключ.\n"
+        "Подробности и заказы: @RATNIKIPCbot"
+    )
+    await update.message.reply_text(text, parse_mode="Markdown")
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -182,6 +192,7 @@ def run_bot():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("confirm", confirm))
+    app.add_handler(CommandHandler("price", price))
     app.add_handler(CallbackQueryHandler(button))
     print("✅ Бот запущен!")
     app.run_polling()
