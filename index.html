@@ -70,7 +70,6 @@
         .card .name { color: #b0c7e7; font-weight: 600; }
         .card .cost { color: #3b82f6; font-size: 1.3rem; font-weight: 700; }
 
-        /* ===== ОТЗЫВЫ ===== */
         .reviews {
             display: flex;
             flex-direction: column;
@@ -83,19 +82,9 @@
             border-radius: 16px;
             border: 1px solid #2a3344;
         }
-        .review .name {
-            font-weight: 600;
-            color: #b0c7e7;
-        }
-        .review .text {
-            color: #c0cbd8;
-            margin-top: 4px;
-            font-size: 14px;
-        }
-        .review .stars {
-            color: #fbbf24;
-            margin-top: 4px;
-        }
+        .review .name { font-weight: 600; color: #b0c7e7; }
+        .review .text { color: #c0cbd8; margin-top: 4px; font-size: 14px; }
+        .review .stars { color: #fbbf24; margin-top: 4px; }
 
         .contacts {
             display: flex;
@@ -211,29 +200,15 @@
         </ul>
     </div>
 
-    <!-- ===== ОТЗЫВЫ ===== -->
     <div class="section">
         <h2>⭐ Отзывы</h2>
         <div class="reviews">
-            <div class="review">
-                <div class="name">Алексей, Москва</div>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <div class="text">«Заказал Telegram-бота для приёма платежей. Всё сделали за 2 дня, работает идеально. Очень доволен.»</div>
-            </div>
-            <div class="review">
-                <div class="name">Екатерина, Киев</div>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <div class="text">«Сделали SMS-рассылку для моей компании. Клиенты получают письма мгновенно, поддержка на высоте.»</div>
-            </div>
-            <div class="review">
-                <div class="name">Сергей, СПб</div>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <div class="text">«APT-симулятор BlackOut — мощный инструмент. Использую для тестов безопасности. Рекомендую.»</div>
-            </div>
+            <div class="review"><div class="name">Алексей, Москва</div><div class="stars">⭐⭐⭐⭐⭐</div><div class="text">«Заказал Telegram-бота для приёма платежей. Всё сделали за 2 дня, работает идеально.»</div></div>
+            <div class="review"><div class="name">Екатерина, Киев</div><div class="stars">⭐⭐⭐⭐⭐</div><div class="text">«Сделали SMS-рассылку для моей компании. Клиенты получают письма мгновенно, поддержка на высоте.»</div></div>
+            <div class="review"><div class="name">Сергей, СПб</div><div class="stars">⭐⭐⭐⭐⭐</div><div class="text">«APT-симулятор BlackOut — мощный инструмент. Использую для тестов безопасности.»</div></div>
         </div>
     </div>
 
-    <!-- ===== ФОРМА ЗАЯВКИ ===== -->
     <div class="section">
         <h2>📝 Оставить заявку</h2>
         <p style="color: #8a9bb5; margin-bottom: 20px;">Заполните форму, и я свяжусь с вами в течение 24 часов.</p>
@@ -309,4 +284,4 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
 });
 </script>
 </body>
-</html>
+                </html>
