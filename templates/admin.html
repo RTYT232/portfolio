@@ -1,167 +1,35 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ панель</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-        body {
-            background: #0b0e14;
-            color: #e0e0e0;
-            padding: 30px 20px;
-            min-height: 100vh;
-        }
-        .header {
-            max-width: 1200px;
-            margin: 0 auto 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header h1 {
-            font-size: 26px;
-            font-weight: 600;
-            color: #fff;
-        }
-        .header h1 span {
-            color: #3b82f6;
-        }
-        .stats-grid {
-            max-width: 1200px;
-            margin: 0 auto 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-        }
-        .stat-card {
-            background: #141a24;
-            border: 1px solid #2a3344;
-            border-radius: 16px;
-            padding: 18px 16px;
-            text-align: center;
-        }
-        .stat-card .num {
-            font-size: 28px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .stat-card .label {
-            font-size: 13px;
-            color: #8a9bb5;
-            margin-top: 4px;
-        }
-        .stat-card .sub {
-            font-size: 12px;
-            color: #4ade80;
-            margin-top: 4px;
-        }
-        .stat-card .sub-sms {
-            color: #60a5fa;
-        }
-        .logout-btn {
-            background: #2a3344;
-            padding: 10px 22px;
-            border-radius: 30px;
-            color: #f87171;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.2s;
-            border: 1px solid #3a4458;
-        }
-        .logout-btn:hover {
-            background: #f87171;
-            color: #fff;
-        }
-        .table-wrap {
-            max-width: 1200px;
-            margin: 20px auto 0;
-            background: #141a24;
-            border-radius: 24px;
-            border: 1px solid #2a3344;
-            overflow: hidden;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th {
-            text-align: left;
-            padding: 14px 12px;
-            color: #8a9bb5;
-            font-weight: 500;
-            font-size: 13px;
-            border-bottom: 1px solid #2a3344;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #1e2633;
-            font-size: 14px;
-        }
-        .badge-paid {
-            background: #0a3d2a;
-            color: #4ade80;
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-wait {
-            background: #3d2a0a;
-            color: #fbbf24;
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .chart {
-            max-width: 1200px;
-            margin: 20px auto 0;
-            background: #141a24;
-            border-radius: 24px;
-            border: 1px solid #2a3344;
-            padding: 20px;
-        }
-        .chart-bars {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            height: 120px;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .bar {
-            flex: 1;
-            background: #3b82f6;
-            border-radius: 6px 6px 0 0;
-            min-height: 4px;
-            transition: 0.3s;
-        }
-        .bar-label {
-            text-align: center;
-            font-size: 11px;
-            color: #8a9bb5;
-            margin-top: 6px;
-        }
-        .footer {
-            max-width: 1200px;
-            margin: 20px auto 0;
-            text-align: center;
-            color: #5a6f8a;
-            font-size: 13px;
-        }
-        .footer a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #0b0e14; color: #e0e0e0; padding: 30px 20px; min-height: 100vh; }
+        .header { max-width: 1200px; margin: 0 auto 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .header h1 { font-size: 26px; font-weight: 600; color: #fff; }
+        .header h1 span { color: #3b82f6; }
+        .stats-grid { max-width: 1200px; margin: 0 auto 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+        .stat-card { background: #141a24; border: 1px solid #2a3344; border-radius: 16px; padding: 18px 16px; text-align: center; }
+        .stat-card .num { font-size: 28px; font-weight: 700; color: #fff; }
+        .stat-card .label { font-size: 13px; color: #8a9bb5; margin-top: 4px; }
+        .stat-card .sub { font-size: 12px; color: #4ade80; margin-top: 4px; }
+        .stat-card .sub-sms { color: #60a5fa; }
+        .logout-btn { background: #2a3344; padding: 10px 22px; border-radius: 30px; color: #f87171; text-decoration: none; font-weight: 500; transition: 0.2s; border: 1px solid #3a4458; }
+        .logout-btn:hover { background: #f87171; color: #fff; }
+        .chart-container { max-width: 1200px; margin: 20px auto 0; background: #141a24; border-radius: 24px; border: 1px solid #2a3344; padding: 20px; }
+        .chart-container h3 { color: #b0c7e7; margin-bottom: 16px; }
+        .table-wrap { max-width: 1200px; margin: 20px auto 0; background: #141a24; border-radius: 24px; border: 1px solid #2a3344; overflow: hidden; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 14px 12px; color: #8a9bb5; font-weight: 500; font-size: 13px; border-bottom: 1px solid #2a3344; }
+        td { padding: 12px; border-bottom: 1px solid #1e2633; font-size: 14px; }
+        .badge-paid { background: #0a3d2a; color: #4ade80; padding: 4px 14px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+        .badge-wait { background: #3d2a0a; color: #fbbf24; padding: 4px 14px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+        .footer { max-width: 1200px; margin: 20px auto 0; text-align: center; color: #5a6f8a; font-size: 13px; }
+        .footer a { color: #3b82f6; text-decoration: none; }
         @media (max-width: 600px) {
             .header { flex-direction: column; align-items: stretch; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -177,65 +45,24 @@
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="num">{{ total_orders }}</div>
-            <div class="label">Всего заказов</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">{{ paid_orders }}</div>
-            <div class="label">Оплачено</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">${{ total_revenue }}</div>
-            <div class="label">Доход</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">${{ avg_check }}</div>
-            <div class="label">Средний чек</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">{{ total_sms }}</div>
-            <div class="label">📱 SMS отправлено</div>
-            <div class="sub sub-sms">+ за всё время</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">{{ total_bots }}</div>
-            <div class="label">🤖 Ботов сделано</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">{{ total_sites }}</div>
-            <div class="label">🌐 Сайтов / лендингов</div>
-        </div>
-        <div class="stat-card">
-            <div class="num">{{ total_clients }}</div>
-            <div class="label">👤 Клиентов</div>
-        </div>
+        <div class="stat-card"><div class="num">{{ total_orders }}</div><div class="label">Всего заказов</div></div>
+        <div class="stat-card"><div class="num">{{ paid_orders }}</div><div class="label">Оплачено</div></div>
+        <div class="stat-card"><div class="num">${{ total_revenue }}</div><div class="label">Доход</div></div>
+        <div class="stat-card"><div class="num">${{ avg_check }}</div><div class="label">Средний чек</div></div>
+        <div class="stat-card"><div class="num">{{ total_sms }}</div><div class="label">📱 SMS отправлено</div><div class="sub sub-sms">+ за всё время</div></div>
+        <div class="stat-card"><div class="num">{{ total_bots }}</div><div class="label">🤖 Ботов сделано</div></div>
+        <div class="stat-card"><div class="num">{{ total_sites }}</div><div class="label">🌐 Сайтов / лендингов</div></div>
+        <div class="stat-card"><div class="num">{{ total_clients }}</div><div class="label">👤 Клиентов</div></div>
     </div>
 
-    <div class="chart">
-        <h3 style="color:#b0c7e7; margin-bottom: 6px;">📈 Продажи по дням</h3>
-        <div class="chart-bars">
-            {% for day in chart_data %}
-                <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-                    <div class="bar" style="height: {{ day.height }}px;"></div>
-                    <div class="bar-label">{{ day.label }}</div>
-                </div>
-            {% endfor %}
-        </div>
+    <div class="chart-container">
+        <h3>📈 График заказов</h3>
+        <canvas id="candleChart" height="100"></canvas>
     </div>
 
     <div class="table-wrap">
         <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Клиент</th>
-                    <th>Тариф</th>
-                    <th>Сумма</th>
-                    <th>Статус</th>
-                    <th>Дата</th>
-                </tr>
-            </thead>
+            <thead><tr><th>ID</th><th>Клиент</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr></thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
@@ -243,13 +70,7 @@
                     <td>{{ order[1] }}</td>
                     <td>{{ order[2] }}</td>
                     <td>${{ order[4] }}</td>
-                    <td>
-                        {% if order[5] %}
-                            <span class="badge-paid">✅ Оплачен</span>
-                        {% else %}
-                            <span class="badge-wait">⏳ Ожидает</span>
-                        {% endif %}
-                    </td>
+                    <td>{% if order[5] %}<span class="badge-paid">✅ Оплачен</span>{% else %}<span class="badge-wait">⏳ Ожидает</span>{% endif %}</td>
                     <td>{{ order[7][:16] }}</td>
                 </tr>
                 {% endfor %}
@@ -260,5 +81,50 @@
     <div class="footer">
         <a href="https://rtyt232.github.io/portfolio/" target="_blank" style="color:#3b82f6;text-decoration:none;">Вернуться на сайт</a>
     </div>
+
+    <script>
+        const ctx = document.getElementById('candleChart').getContext('2d');
+        const chartData = {{ chart_data | safe }};
+
+        const labels = chartData.map(d => d.label);
+        const values = chartData.map(d => d.value);
+
+        const colors = values.map((v, i) => {
+            if (i === 0) return '#4ade80';
+            return v >= values[i-1] ? '#4ade80' : '#f87171';
+        });
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Заказы',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: colors.map(c => c),
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, color: '#8a9bb5' },
+                        grid: { color: '#2a3344' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#8a9bb5' }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
