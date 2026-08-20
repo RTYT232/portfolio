@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Личный кабинет</title></head>
+<body>
+    <h2>Личный кабинет</h2>
+    <p>Привет, {{ user[1] }}!</p>
+    <h3>Ваши заказы</h3>
+    <ul>
+        {% for order in orders %}
+        <li>Тариф: {{ order[2] }} — ${{ order[3] }} — {{ 'Оплачен' if order[4] else 'Ожидает оплаты' }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/buy/lite">Купить Lite ($99)</a><br>
+    <a href="/buy/pro">Купить Pro ($299)</a><br>
+    <a href="/buy/enterprise">Купить Enterprise ($999)</a><br>
+    <a href="/logout">Выйти</a>
+</body>
+</html>
