@@ -4,11 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eliot Cross | IT-решения</title>
-    <meta property="og:title" content="Eliot Cross | IT-решения" />
-    <meta property="og:description" content="Боты, сайты, SMS-рассылки, автоматизация, безопасность." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://rtyt232.github.io/portfolio/" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -29,6 +25,11 @@
             border-radius: 28px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             border: 1px solid #2a3344;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         h1 { font-size: 2.6rem; font-weight: 700; color: #ffffff; margin-bottom: 6px; }
         .tagline {
@@ -46,30 +47,56 @@
             border-bottom: 1px solid #2a3344;
             padding-bottom: 6px;
         }
-        .section ul { list-style: none; padding: 0; }
-        .section ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid #1e2633;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section ul li::before { content: "▹"; color: #3b82f6; font-weight: bold; }
-        .price-grid {
-            display: flex;
-            flex-wrap: wrap;
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 16px;
             margin-top: 12px;
         }
-        .price-card {
+        .card {
             background: #1e2633;
-            padding: 16px 22px;
+            padding: 18px 16px;
             border-radius: 16px;
-            flex: 1 1 160px;
+            border: 1px solid #2a3344;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+        .card i { font-size: 2rem; color: #3b82f6; margin-bottom: 8px; }
+        .card .name { color: #b0c7e7; font-weight: 600; }
+        .card .cost { color: #3b82f6; font-size: 1.3rem; font-weight: 700; }
+
+        /* ===== ОТЗЫВЫ ===== */
+        .reviews {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .review {
+            background: #1e2633;
+            padding: 16px 20px;
+            border-radius: 16px;
             border: 1px solid #2a3344;
         }
-        .price-card .name { color: #b0c7e7; font-weight: 600; }
-        .price-card .cost { color: #3b82f6; font-size: 1.4rem; font-weight: 700; }
+        .review .name {
+            font-weight: 600;
+            color: #b0c7e7;
+        }
+        .review .text {
+            color: #c0cbd8;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .review .stars {
+            color: #fbbf24;
+            margin-top: 4px;
+        }
+
         .contacts {
             display: flex;
             flex-wrap: wrap;
@@ -157,33 +184,56 @@
 
     <div class="section">
         <h2>🚀 Что я делаю</h2>
-        <ul>
-            <li>Telegram-боты (оплата, выдача файлов, автоответы)</li>
-            <li>Сайты, лендинги, админ-панели</li>
-            <li>Скрипты для парсинга и рассылок</li>
-            <li>SMS-рассылки по всему миру (от $0.03)</li>
-            <li>APT-симулятор BlackOut (тестирование защищённости Windows)</li>
+        <ul style="list-style:none; padding:0;">
+            <li style="padding:6px 0;"><i class="fas fa-robot" style="color:#3b82f6;width:24px;"></i> Telegram-боты (оплата, выдача файлов, автоответы)</li>
+            <li style="padding:6px 0;"><i class="fas fa-code" style="color:#3b82f6;width:24px;"></i> Сайты, лендинги, админ-панели</li>
+            <li style="padding:6px 0;"><i class="fas fa-cogs" style="color:#3b82f6;width:24px;"></i> Скрипты для парсинга и рассылок</li>
+            <li style="padding:6px 0;"><i class="fas fa-sms" style="color:#3b82f6;width:24px;"></i> SMS-рассылки по всему миру (от $0.03)</li>
+            <li style="padding:6px 0;"><i class="fas fa-shield-alt" style="color:#3b82f6;width:24px;"></i> APT-симулятор BlackOut</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>💰 Цены (ориентир)</h2>
-        <div class="price-grid">
-            <div class="price-card"><div class="name">Telegram-бот</div><div class="cost">от $150</div></div>
-            <div class="price-card"><div class="name">Сайт-визитка</div><div class="cost">от $200</div></div>
-            <div class="price-card"><div class="name">SMS-рассылка (1000)</div><div class="cost">от $30</div></div>
+        <div class="cards">
+            <div class="card"><i class="fas fa-robot"></i><div class="name">Telegram-бот</div><div class="cost">от $150</div></div>
+            <div class="card"><i class="fas fa-globe"></i><div class="name">Сайт-визитка</div><div class="cost">от $200</div></div>
+            <div class="card"><i class="fas fa-sms"></i><div class="name">SMS-рассылка (1000)</div><div class="cost">от $30</div></div>
         </div>
     </div>
 
     <div class="section">
         <h2>📁 Примеры работ</h2>
-        <ul>
-            <li><strong>BlackOut</strong> — APT-симулятор для Windows</li>
-            <li><strong>SMS-рассылка</strong> — Австралия, 1000+ SMS</li>
-            <li><strong>Telegram-бот</strong> — приём платежей в крипте</li>
+        <ul style="list-style:none; padding:0;">
+            <li style="padding:6px 0;"><i class="fas fa-check-circle" style="color:#3b82f6;width:24px;"></i> <strong>BlackOut</strong> — APT-симулятор для Windows</li>
+            <li style="padding:6px 0;"><i class="fas fa-check-circle" style="color:#3b82f6;width:24px;"></i> <strong>SMS-рассылка</strong> — Австралия, 1000+ SMS</li>
+            <li style="padding:6px 0;"><i class="fas fa-check-circle" style="color:#3b82f6;width:24px;"></i> <strong>Telegram-бот</strong> — приём платежей в крипте</li>
         </ul>
     </div>
 
+    <!-- ===== ОТЗЫВЫ ===== -->
+    <div class="section">
+        <h2>⭐ Отзывы</h2>
+        <div class="reviews">
+            <div class="review">
+                <div class="name">Алексей, Москва</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="text">«Заказал Telegram-бота для приёма платежей. Всё сделали за 2 дня, работает идеально. Очень доволен.»</div>
+            </div>
+            <div class="review">
+                <div class="name">Екатерина, Киев</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="text">«Сделали SMS-рассылку для моей компании. Клиенты получают письма мгновенно, поддержка на высоте.»</div>
+            </div>
+            <div class="review">
+                <div class="name">Сергей, СПб</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="text">«APT-симулятор BlackOut — мощный инструмент. Использую для тестов безопасности. Рекомендую.»</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ФОРМА ЗАЯВКИ ===== -->
     <div class="section">
         <h2>📝 Оставить заявку</h2>
         <p style="color: #8a9bb5; margin-bottom: 20px;">Заполните форму, и я свяжусь с вами в течение 24 часов.</p>
@@ -208,10 +258,10 @@
     <div class="section">
         <h2>📩 Контакты</h2>
         <div class="contacts">
-            <a href="https://t.me/RATNIKIPCbot" target="_blank">📬 Telegram (заказы)</a>
-            <a href="https://t.me/BLACKOUTCPP" target="_blank">📢 Канал</a>
-            <a href="https://www.tiktok.com/@blackout.sec" target="_blank">🎵 TikTok</a>
-            <a href="https://youtube.com/@EliotCross-c4d" target="_blank">▶️ YouTube</a>
+            <a href="https://t.me/RATNIKIPCbot" target="_blank"><i class="fab fa-telegram"></i> Telegram (заказы)</a>
+            <a href="https://t.me/BLACKOUTCPP" target="_blank"><i class="fab fa-telegram"></i> Канал</a>
+            <a href="https://www.tiktok.com/@blackout.sec" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+            <a href="https://youtube.com/@EliotCross-c4d" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
         </div>
         <br />
         <a href="https://t.me/RATNIKIPCbot" class="btn" target="_blank">📩 Связаться</a>
