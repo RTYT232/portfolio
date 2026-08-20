@@ -14,6 +14,7 @@ USDT_ADDRESS = "TEmyv3w1CjftMMbF4qxEffV8P2P3D9m8xa"
 FILE_URL = "https://tmpfiles.org/wRwDSeA58F4E/blackout.exe"
 ADMIN_USER = "admin"
 ADMIN_PASS = "swill2026"
+ADMIN_CHAT_ID = "8640296115"  # Твой Telegram ID
 
 # ===== БАЗА ДАННЫХ =====
 def init_db():
@@ -147,7 +148,7 @@ def run_bot():
     print("✅ Бот запущен!")
     app.run_polling()
 
-# ===== FLASK АДМИНКА =====
+# ===== FLASK АДМИНКА + ОБРАБОТЧИК ЗАЯВОК =====
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
@@ -157,7 +158,7 @@ def login():
         if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin_dashboard'))
-        return "Неверный логин или пароль"
+        return render_template('login.html', error="Неверный логин или пароль")
     return render_template('login.html')
 
 @app.route('/admin')
@@ -167,7 +168,11 @@ def admin_dashboard():
     orders = get_all_orders()
     return render_template('admin.html', orders=orders)
 
-@app.route('/logout') 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 @app.route('/send-request', methods=['POST'])
 def send_request():
     import requests as req
@@ -176,10 +181,9 @@ def send_request():
     if not message:
         return {'error': 'no message'}, 400
 
-    # Отправляем в Telegram тебе
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {
-        'chat_id': '@Frycrycry',  # ⚠️@Frycrycry
+        'chat_id': ADMIN_CHAT_ID,
         'text': message,
         'parse_mode': 'HTML'
     }
@@ -191,9 +195,6 @@ def send_request():
             return {'error': 'telegram error'}, 500
     except:
         return {'error': 'network error'}, 500
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login'))
 
 # ===== ЗАПУСК ВСЕГО =====
 if __name__ == "__main__":
